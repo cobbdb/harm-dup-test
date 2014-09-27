@@ -1,0 +1,11 @@
+body {
+    text-align: center;
+}
+.ad {
+    border: 1px solid black;
+    margin-top: 30px;
+}
+.ad div {
+    margin: auto;
+    text-align: center;
+}

@@ -1,0 +1,42 @@
+{
+  "name": "lumberjack",
+  "authors": [
+    "cobbdb <cobbdb@gmail.com>"
+  ],
+  "description": "Plugable front-end logging.",
+  "main": "dist/lumberjack.min.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "logging",
+    "front-end",
+    "javascript",
+    "js",
+    "logger",
+    "reporting",
+    "eventing",
+    "callbacks",
+    "simple",
+    "plugable"
+  ],
+  "license": "MIT",
+  "homepage": "http://cobbdb.github.io/lumberjack/",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "version": "1.0.9",
+  "_release": "1.0.9",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.9",
+    "commit": "eb3446447cd8eab950c76d119419955f2af59844"
+  },
+  "_source": "git://github.com/cobbdb/lumberjack.git",
+  "_target": "1.0.x",
+  "_originalSource": "lumberjack"
+}

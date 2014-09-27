@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="style.css" media="all" rel="stylesheet" type="text/css">
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//www.googletagservices.com/tag/js/gpt.js"></script>
+    <script src="bower_components/lumberjack/dist/lumberjack.min.js"></script>
+    <script src="bower_components/harmony/dist/harmony.min.js"></script>
+    <script>
+        harm = Harmony();
+        conf = {
+            slots: [{
+                name: 'TST01',
+                id: 'DVID01',
+                sizes: [
+                    [728, 90]
+                ],
+                adunit: '/11347122/dev-test',
+                breakpoint: 'BKP01'
+            }, {
+                name: 'TST01',
+                id: 'DVID01',
+                sizes: [
+                    [970, 30]
+                ],
+                adunit: '/11347122/dev-test',
+                breakpoint: 'BKP01'
+            }, {
+                name: 'TST01',
+                id: 'DVID01',
+                sizes: [
+                    [615, 30]
+                ],
+                adunit: '/11347122/dev-test',
+                breakpoint: 'BKP01'
+            }]
+        };
+        $(function () {
+            harm.load(conf);
+            googletag.enableServices();
+            harm.show.breakpoint('BKP01');
+            $('#more').on('click', function () {
+                $('<div>', {
+                    id: 'DVID01',
+                    'class': 'ad'
+                }).prependTo('#adwell');
+                harm.defineSlot({
+                    name: 'TST01',
+                    id: 'DVID01',
+                    sizes: [
+                        [728, 90],
+                        [320, 165],
+                        [1200, 120],
+                        [120, 90],
+                        [300, 100],
+                        [468, 60],
+                        [620, 57],
+                        [970, 30]
+                    ],
+                    adunit: '/11347122/dev-test',
+                    breakpoint: 'BKP01'
+                });
+                harm.show.breakpoint('BKP01');
+            });
+        });
+    </script>
+</head>
+<body>
+    <button id="more">Create More Ads</button>
+    <div id="adwell">
+        <div id="DVID01" class="ad"></div>
+        <div id="DVID01" class="ad"></div>
+        <div id="DVID01" class="ad"></div>
+    </div>
+</body>
+</html>
