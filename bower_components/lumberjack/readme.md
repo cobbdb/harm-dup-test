@@ -1,10 +1,11 @@
 [![Lumberjack](http://i.imgur.com/d0rKge1.png)](https://cobbdb.github.io/lumberjack)
 
-[![Bower version](https://badge.fury.io/bo/lumberjack.svg)](http://badge.fury.io/bo/lumberjack)
+[![Bower version](https://badge.fury.io/bo/lumberjack.svg)](http://badge.fury.io/bo/lumberjack) [![NPM version](https://badge.fury.io/js/lumberjackjs.svg)](http://badge.fury.io/js/lumberjackjs)
 
-Plugable front-end logging.
+Plugable JavaScript logging.
 
     $ bower install lumberjack
+    $ npm install lumberjackjs
 
 -------------
 #### Creating a new Lumberjack
@@ -51,6 +52,11 @@ Every log entry has a timestamp so you can tell when events happened.
 
     log.readback('gallery');
     log.readback('gallery', true); // Pretty-print
+
+Quickly check on what log channels are in use.
+
+    log.readback.channels(); // Array of channel names
+    log.readback.channels(true); // Pretty-print
 
 #### View all events in order
 The master record contains all log entries in order.

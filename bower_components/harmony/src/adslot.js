@@ -1,7 +1,9 @@
+var log = require('./log.js'),
+    set = require('./slotset.js');
+
 /**
  * # Ad Slot
  * Constructs a new adSlot in the page.
- * @param {Object} opts Options object.
  * @param {String} opts.name Slot name, ex) RP01
  * @param {String} opts.id Slot's div id, ex) ad-div-RP01
  * @param {Array} opts.sizes One or many 2D arrays, ex) [300, 250]
@@ -13,56 +15,61 @@
  * @param {Boolean} [opts.interstitial] True if out-of-page ad.
  * @param {Function} [opts.callback] Called on dfp's slotRenderEnded.
  */
-function AdSlot(pubads, opts) {
-    var slot, i;
-    // Create the callback queue for this slot.
-    var cbQueue = {
-        slotRenderEnded: []
-    };
-    // Capture timestamp for performance metrics.
-    var tsCreate = new Date();
-    log('init', 'Slot ' + opts.name + ' defined.');
+module.exports = function (pubads, opts) {
+    var slot, i,
+        // Grab any preloaded callbacks.
+        cbQueue = set.cached.callbacks(opts.name),
+        // Capture timestamp for performance metrics.
+        tsCreate = new Date().getTime(),
+        mapping = opts.mapping || [],
+        companion = opts.companion || false,
+        interstitial = opts.interstitial || false,
+        targeting = opts.targeting || {};
 
-    // Set default values.
-    var mapping = opts.mapping || [];
-    var companion = opts.companion || false;
-    var interstitial = opts.interstitial || false;
-    var targeting = opts.targeting || {};
+    log('init', {
+        msg: 'Creating new ad slot.',
+        conf: opts
+    });
+
+    // Smoke test that the slot's element id is valid in the DOM.
+    if (!global.document.getElementById(opts.id)) {
+        throw Error('Ad slot container was not found in the DOM.');
+    }
 
     // Define which type of slot this is.
     if (opts.interstitial) {
-        slot = googletag.defineOutOfPageSlot(opts.adunit, opts.id);
+        slot = global.googletag.defineOutOfPageSlot(opts.adunit, opts.id);
     } else {
-        slot = googletag.defineSlot(opts.adunit, opts.sizes, opts.id);
+        slot = global.googletag.defineSlot(opts.adunit, opts.sizes, opts.id);
     }
 
     /**
-     * ## harmony.slot.&lt;name&gt;.divId
+     * ## harmony.slot(name).divId
      * Slot's containing div id.
      * @type {String}
      */
     slot.divId = opts.id;
     /**
-     * ## harmony.slot.&lt;name&gt;.name
+     * ## harmony.slot(name).name
      * Slot's name.
      * @type {String}
      */
     slot.name = opts.name;
     /**
-     * ## harmony.slot.&lt;name&gt;.breakpoint
+     * ## harmony.slot(name).breakpoint
      * This slot's breakpoint.
      * @type {String}
      */
     slot.breakpoint = opts.breakpoint;
     /**
-     * ## harmony.slot.&lt;name&gt;.sizes
+     * ## harmony.slot(name).sizes
      * This slot's possible sizes. Note, this is
      * not the current size of the ad slot.
      * @type {Array}
      */
     slot.sizes = opts.sizes;
     /**
-     * ## harmony.slot.&lt;name&gt;.adunit
+     * ## harmony.slot(name).adunit
      * Ad unit code of this ad slot.
      */
     slot.adunit = opts.adunit;
@@ -73,17 +80,24 @@ function AdSlot(pubads, opts) {
         slot.setTargeting(i, targeting[i]);
     }
 
+    // Load in any targeting set before this slow was defined.
+    targeting = set.cached.targeting(opts.name);
+    for (i in targeting) {
+        slot.setTargeting(i, targeting[i]);
+    }
+
     // Assign size mapping for responsive ad slots.
     slot.defineSizeMapping(mapping);
 
     // Load any provided callback into queue.
+    cbQueue.slotRenderEnded = cbQueue.slotRenderEnded || [];
     if (typeof opts.callback === 'function') {
         cbQueue.slotRenderEnded.push(opts.callback);
         log('init', 'Attached provided callback for ' + opts.name);
     }
 
     /**
-     * ## harmony.slot.&lt;name&gt;.on
+     * ## harmony.slot(name).on(event, cb)
      * Attaches a callback to a DFP event. Currently, only the
      * slotRenderEnded event is offered by the DFP API.
      * @param {String} event Name of the event to bind to.
@@ -96,13 +110,35 @@ function AdSlot(pubads, opts) {
         log('init', 'Attached new callback for ' + event);
     };
 
+    /**
+     * ## harmony.slot(name).trigger(event, data)
+     * Manually fire an event.
+     * @param {String} event Name of the event.
+     * @param {Any} [data] Data to pass to each callback.
+     */
+    slot.trigger = function (event, data) {
+        var i, len;
+        if (event in cbQueue) {
+            log('event', 'Triggering ' + event);
+            len = cbQueue[event].length;
+            for (i = 0; i < len; i += 1) {
+                cbQueue[event][i](data);
+            }
+        } else {
+            log('event', {
+                msg: 'Failed to trigger ' + event,
+                reason: 'No callbacks were found.'
+            });
+        }
+    };
+
     // Attach a listener for the slotRenderEnded event.
     pubads.addEventListener('slotRenderEnded', function (event) {
         var i, len, now;
         if (event.slot === slot) {
             log('event', 'slotRenderEnded for ' + opts.name);
             // Log the total load time of this slot.
-            now = new Date();
+            now = new Date().getTime();
             log('metric', {
                 event: 'Total load time',
                 slot: opts.name,
@@ -118,10 +154,12 @@ function AdSlot(pubads, opts) {
 
     // Assign companion ad service if requested.
     if (companion) {
-        slot.addService(googletag.companionAds());
+        slot.addService(
+            global.googletag.companionAds()
+        );
     }
 
     // Add the publisher service and return the new ad slot.
     slot.addService(pubads);
     return slot;
-}
+};

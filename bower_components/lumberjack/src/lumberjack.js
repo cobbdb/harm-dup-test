@@ -6,12 +6,12 @@
  * @return {Object} A new Lumberjack.
  * @see GitHub-Page http://github.com/cobbdb/lumberjack
  */
-window.Lumberjack = function (enabled) {
-    var log;
-    var record = {};
-    var cbQueue = {};
-    var master = [];
-    var ls = localStorage || {};
+module.exports = function (enabled) {
+    var log,
+        record = {},
+        cbQueue = {},
+        master = [],
+        ls = localStorage || {};
 
     /**
      * ## log(channel, data)
@@ -31,7 +31,7 @@ window.Lumberjack = function (enabled) {
         if (channelValid && dataValid) {
             /**
              * All log entries take the form of:
-             * ```js
+             * ```javascript
              *  {
              *      time: // timestamp when entry was logged
              *      data: // the logged data
@@ -74,7 +74,7 @@ window.Lumberjack = function (enabled) {
             if (pretty) {
                 return JSON.stringify(record[channel], null, 4);
             }
-            return record[channel];
+            return record[channel] || [];
         }
         throw Error('log.readback(channel, pretty) requires an channel {String}.');
     };
@@ -89,6 +89,19 @@ window.Lumberjack = function (enabled) {
             return JSON.stringify(master, null, 4);
         }
         return master;
+    };
+    /**
+     * ## log.readback.channels([pretty])
+     * Fetch list of log channels currently in use.
+     * @param {Boolean} [pretty] True to create a formatted string result.
+     * @return {Array|String} This log's set of used channels.
+     */
+    log.readback.channels = function (pretty) {
+        var keys = Object.keys(record);
+        if (pretty) {
+            return JSON.stringify(keys);
+        }
+        return keys;
     };
     /**
      * ## log.on(channel, cb)

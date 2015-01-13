@@ -29,12 +29,12 @@
     "test",
     "tests"
   ],
-  "version": "1.0.9",
-  "_release": "1.0.9",
+  "version": "1.0.13",
+  "_release": "1.0.13",
   "_resolution": {
     "type": "version",
-    "tag": "1.0.9",
-    "commit": "eb3446447cd8eab950c76d119419955f2af59844"
+    "tag": "1.0.13",
+    "commit": "adcef81027dfa0e8748d56552d2ad0c193787a69"
   },
   "_source": "git://github.com/cobbdb/lumberjack.git",
   "_target": "1.0.x",
